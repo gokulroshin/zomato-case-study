@@ -3,7 +3,7 @@
 .env.local
 
 # Data cache (downloaded dataset)
-data/
+/data/
 
 # Python
 __pycache__/
