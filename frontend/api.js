@@ -4,7 +4,7 @@
 
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://127.0.0.1:8000/api/v1' 
-    : 'https://<your-railway-app-url>/api/v1'; // TODO: Replace with actual Railway backend URL
+    : 'https://zomato-case-study-production.up.railway.app/api/v1';
 
 /**
  * Fetches available locations, cuisines, and budget tiers for the form.
