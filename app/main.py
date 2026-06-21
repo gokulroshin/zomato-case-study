@@ -7,6 +7,7 @@ startup lifecycle.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -47,20 +48,24 @@ async def lifespan(app: FastAPI):
     cache_exists = settings.cache_path.exists()
     app_state["cache_hit"] = cache_exists
 
-    try:
-        raw_df: pd.DataFrame = load_dataset()
-        df: pd.DataFrame = preprocess(raw_df)
-        app_state["df"] = df
-        app_state["dataset_loaded"] = True
-        app_state["dataset_rows"] = len(df)
-        logger.info(
-            "Dataset ready: %d rows (cache %s).",
-            len(df),
-            "hit" if cache_exists else "miss — downloaded from HF",
-        )
-    except Exception:
-        logger.exception("Failed to load or preprocess dataset.")
-        # The app still starts so the health endpoint can report the failure.
+    def _load_task():
+        try:
+            raw_df: pd.DataFrame = load_dataset()
+            df: pd.DataFrame = preprocess(raw_df)
+            app_state["df"] = df
+            app_state["dataset_loaded"] = True
+            app_state["dataset_rows"] = len(df)
+            logger.info(
+                "Dataset ready: %d rows (cache %s).",
+                len(df),
+                "hit" if cache_exists else "miss — downloaded from HF",
+            )
+        except Exception:
+            logger.exception("Failed to load or preprocess dataset.")
+            # The app still starts so the health endpoint can report the failure.
+
+    # Run dataset loading in a background thread so Uvicorn can finish startup and bind its port immediately.
+    asyncio.create_task(asyncio.to_thread(_load_task))
 
     yield
     # Shutdown cleanup (if any) goes here.
