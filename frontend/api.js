@@ -2,7 +2,9 @@
  * api.js - Handles communication with the FastAPI backend.
  */
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://127.0.0.1:8000/api/v1' 
+    : 'https://<your-railway-app-url>/api/v1'; // TODO: Replace with actual Railway backend URL
 
 /**
  * Fetches available locations, cuisines, and budget tiers for the form.

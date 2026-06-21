@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.data.loader import load_dataset
@@ -107,5 +106,3 @@ async def health_check():
         },
     }
 
-# ── Static Frontend ─────────────────────────────────────────────
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
